@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Central de Tarefas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<meta name="theme-color" content="#d9772b">
+<style>
+  :root {
+    --bg: #eceef1;
+    --surface: #ffffff;
+    --surface-2: #f5f6f8;
+    --line: #d9dde3;
+    --line-strong: #c2c8d1;
+    --ink: #1c2530;
+    --ink-2: #4a5563;
+    --ink-3: #7a8493;
+    --accent: #d9772b;
+    --accent-ink: #ffffff;
+    --danger: #c8412f;
+    --danger-soft: #fbe3df;
+    --warn: #b8791b;
+    --warn-soft: #fbeecf;
+    --ok: #2f8256;
+    --ok-soft: #dcefe3;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 4px 14px rgba(20,30,45,.06);
+    --shadow-lg: 0 10px 40px rgba(20,30,45,.22);
+    --radius: 12px;
+    --c-licitacao: #2f6fb8;
+    --c-producao: #c07514;
+    --c-financeiro: #2f8256;
+    --c-comercial: #7a4fb0;
+    --c-fundicao: #a4562a;
+    --c-fornecedores: #157e7a;
+    --c-pessoal: #b8407a;
+    --c-outros: #6b7686;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161c; --surface: #1b2129; --surface-2: #222a34;
+      --line: #2e3742; --line-strong: #3b4653;
+      --ink: #e7ebf0; --ink-2: #aeb7c2; --ink-3: #7e8895;
+      --accent: #e88a3d; --accent-ink: #1a1206;
+      --danger: #e5705f; --danger-soft: #3a201c;
+      --warn: #d9a545; --warn-soft: #362a15;
+      --ok: #57b183; --ok-soft: #16301f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+      --shadow-lg: 0 12px 44px rgba(0,0,0,.55);
+      --c-licitacao: #5b9de0; --c-producao: #e0a24f; --c-financeiro: #57b183;
+      --c-comercial: #a884d8; --c-fundicao: #cf8455; --c-fornecedores: #45b0ab;
+      --c-pessoal: #e072a5; --c-outros: #97a2b1;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161c; --surface: #1b2129; --surface-2: #222a34;
+    --line: #2e3742; --line-strong: #3b4653;
+    --ink: #e7ebf0; --ink-2: #aeb7c2; --ink-3: #7e8895;
+    --accent: #e88a3d; --accent-ink: #1a1206;
+    --danger: #e5705f; --danger-soft: #3a201c;
+    --warn: #d9a545; --warn-soft: #362a15;
+    --ok: #57b183; --ok-soft: #16301f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+    --shadow-lg: 0 12px 44px rgba(0,0,0,.55);
+    --c-licitacao: #5b9de0; --c-producao: #e0a24f; --c-financeiro: #57b183;
+    --c-comercial: #a884d8; --c-fundicao: #cf8455; --c-fornecedores: #45b0ab;
+    --c-pessoal: #e072a5; --c-outros: #97a2b1;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  h1, h2, h3 { font-family: "Archivo", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 20px 16px 120px; }
+
+  header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .glyph { width: 42px; height: 42px; border-radius: 11px; flex: none; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 22px; box-shadow: var(--shadow); }
+  .brand h1 { font-size: 23px; margin: 0; line-height: 1.1; }
+  .brand .sub { color: var(--ink-3); font-size: 12.5px; margin-top: 2px; letter-spacing: .02em; }
+  .head-actions { display: flex; align-items: center; gap: 8px; position: relative; }
+
+  .btn { font: inherit; font-weight: 600; cursor: pointer; border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 9px 14px; display: inline-flex; align-items: center; gap: 7px; transition: transform .06s ease, background .15s, border-color .15s; }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.icon { padding: 9px 11px; }
+  .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .task-check:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .menu { position: absolute; top: calc(100% + 6px); right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; box-shadow: var(--shadow-lg); padding: 6px; min-width: 210px; z-index: 40; }
+  .menu button { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; background: none; border: none; color: var(--ink); font: inherit; padding: 9px 10px; border-radius: 8px; cursor: pointer; }
+  .menu button:hover { background: var(--surface-2); }
+  .menu button.danger { color: var(--danger); }
+  .menu .sep { height: 1px; background: var(--line); margin: 5px 2px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; text-align: left; transition: border-color .15s; font: inherit; }
+  .stat:hover { border-color: var(--line-strong); }
+  .stat.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .stat .n { font-family: "Archivo"; font-size: 27px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 12px; color: var(--ink-3); margin-top: 5px; text-transform: uppercase; letter-spacing: .05em; }
+  .stat.s-late .n { color: var(--danger); }
+  .stat.s-today .n { color: var(--warn); }
+  .stat.s-week .n { color: var(--accent); }
+  .stat.s-done .n { color: var(--ok); }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+  .search { position: relative; flex: 1 1 220px; min-width: 160px; }
+  .search input { width: 100%; padding-left: 34px; }
+  .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); }
+  input, select, textarea { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px; }
+  select { cursor: pointer; }
+
+  .group-h { display: flex; align-items: center; gap: 9px; margin: 22px 2px 9px; }
+  .group-h .name { font-family: "Archivo"; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+  .group-h .count { font-size: 12px; color: var(--ink-3); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 1px 8px; }
+  .group-h .bar { height: 1px; background: var(--line); flex: 1; }
+  .group-h.late .name { color: var(--danger); }
+  .group-h.today .name { color: var(--warn); }
+
+  .task { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 9px; box-shadow: var(--shadow); overflow: hidden; border-left: 4px solid var(--cat, var(--line-strong)); }
+  .task-main { display: flex; gap: 12px; padding: 13px 14px; align-items: flex-start; }
+  .task-check { flex: none; width: 22px; height: 22px; border-radius: 7px; margin-top: 1px; border: 2px solid var(--line-strong); background: var(--surface-2); cursor: pointer; display: grid; place-items: center; transition: all .15s; padding: 0; }
+  .task-check:hover { border-color: var(--ok); }
+  .task-check svg { opacity: 0; transform: scale(.6); transition: all .15s; color: #fff; }
+  .task.done .task-check { background: var(--ok); border-color: var(--ok); }
+  .task.done .task-check svg { opacity: 1; transform: scale(1); }
+  .task-body { flex: 1; min-width: 0; }
+  .task-title { font-weight: 600; font-size: 15.5px; word-wrap: break-word; overflow-wrap: anywhere; }
+  .task.done .task-title { text-decoration: line-through; color: var(--ink-3); }
+  .task-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: center; }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+  .chip.cat { background: color-mix(in srgb, var(--cat) 15%, transparent); color: var(--cat); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .prio.alta { background: var(--danger-soft); color: var(--danger); }
+  .prio.media { background: var(--warn-soft); color: var(--warn); }
+  .prio.baixa { background: var(--surface-2); color: var(--ink-3); border: 1px solid var(--line); }
+  .due { font-family: "IBM Plex Mono", monospace; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .due.late { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+  .due.today { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+  .resp { color: var(--ink-3); font-size: 12.5px; display: inline-flex; align-items: center; gap: 4px; }
+  .clist-badge { color: var(--ink-3); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
+
+  .task-side { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .mini { background: transparent; border: none; cursor: pointer; color: var(--ink-3); padding: 6px; border-radius: 7px; display: grid; place-items: center; }
+  .mini:hover { background: var(--surface-2); color: var(--ink); }
+
+  .task-expand { border-top: 1px solid var(--line); padding: 0 14px 14px 48px; display: none; }
+  .task.open .task-expand { display: block; }
+  .task.open .caret { transform: rotate(90deg); }
+  .caret { transition: transform .15s; }
+  .notes-block { margin-top: 12px; font-size: 14px; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .sec-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 700; margin: 12px 0 6px; }
+  .clist { display: flex; flex-direction: column; gap: 3px; }
+  .cl-item { display: flex; align-items: center; gap: 9px; padding: 3px 0; }
+  .cl-box { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--line-strong); cursor: pointer; flex: none; display: grid; place-items: center; background: var(--surface-2); padding: 0; }
+  .cl-box svg { opacity: 0; color: #fff; }
+  .cl-item.checked .cl-box { background: var(--ok); border-color: var(--ok); }
+  .cl-item.checked .cl-box svg { opacity: 1; }
+  .cl-item.checked .cl-text { text-decoration: line-through; color: var(--ink-3); }
+  .cl-text { flex: 1; font-size: 14px; overflow-wrap: anywhere; }
+  .cl-del { background: none; border: none; color: var(--ink-3); cursor: pointer; padding: 2px 6px; }
+  .cl-del:hover { color: var(--danger); }
+  .cl-add { display: flex; gap: 7px; margin-top: 7px; }
+  .cl-add input { flex: 1; padding: 6px 9px; font-size: 13.5px; }
+  .cl-add button { padding: 6px 12px; }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--ink-3); }
+  .empty .big { font-size: 40px; margin-bottom: 10px; }
+  .empty h3 { color: var(--ink-2); font-size: 18px; margin: 0 0 6px; }
+  .empty p { margin: 0 0 18px; }
+
+  .save-note { font-size: 11.5px; color: var(--ink-3); display: inline-flex; align-items: center; gap: 5px; }
+  .save-note .dot { background: var(--ok); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(15,20,28,.5); display: none; align-items: flex-start; justify-content: center; padding: 24px 16px; z-index: 50; overflow-y: auto; }
+  .backdrop.show { display: flex; }
+  .modal { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-lg); width: 100%; max-width: 520px; border: 1px solid var(--line); margin: auto 0; }
+  .modal-h { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+  .modal-h h2 { margin: 0; font-size: 18px; }
+  .modal-b { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 5px; }
+  .field input, .field select, .field textarea { width: 100%; }
+  .field textarea { resize: vertical; min-height: 72px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-f { display: flex; justify-content: space-between; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--line); }
+  .prio-pick { display: flex; gap: 7px; }
+  .prio-opt { flex: 1; text-align: center; padding: 8px; border-radius: 8px; border: 1.5px solid var(--line-strong); background: var(--surface-2); cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .prio-opt[aria-pressed="true"].alta { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+  .prio-opt[aria-pressed="true"].media { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+  .prio-opt[aria-pressed="true"].baixa { background: var(--surface-2); color: var(--ink); border-color: var(--ink-3); }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 620px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .brand h1 { font-size: 20px; }
+    .row2 { grid-template-columns: 1fr; }
+    .head-actions .lbltxt { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="glyph">📋</div>
+      <div>
+        <h1>Central de Tarefas</h1>
+        <div class="sub"><span class="save-note"><span class="dot"></span>salvo neste aparelho</span></div>
+      </div>
+    </div>
+    <div class="head-actions">
+      <button class="btn icon" id="theme-btn" title="Tema claro/escuro" aria-label="Alternar tema">🌗</button>
+      <button class="btn icon" id="menu-btn" title="Mais opções" aria-label="Mais opções">⋯</button>
+      <button class="btn primary" id="add-btn"><span>＋</span><span class="lbltxt">Nova tarefa</span></button>
+      <div class="menu" id="menu" hidden>
+        <button id="m-backup">⬇️ Baixar backup (.json)</button>
+        <button id="m-restore">⬆️ Restaurar backup</button>
+        <div class="sep"></div>
+        <button id="m-clear-done">🧹 Limpar concluídas</button>
+        <button id="m-wipe" class="danger">🗑️ Apagar tudo</button>
+      </div>
+      <input type="file" id="restore-input" accept="application/json,.json" hidden>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="search" placeholder="Buscar tarefa…">
+    </div>
+    <select id="f-cat"><option value="">Todas categorias</option></select>
+    <select id="f-prio">
+      <option value="">Toda prioridade</option>
+      <option value="alta">Alta</option>
+      <option value="media">Média</option>
+      <option value="baixa">Baixa</option>
+    </select>
+    <select id="sort">
+      <option value="prazo">Ordenar: prazo</option>
+      <option value="prioridade">Ordenar: prioridade</option>
+      <option value="categoria">Ordenar: categoria</option>
+      <option value="criacao">Ordenar: mais recentes</option>
+    </select>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<div class="backdrop" id="backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-h">
+      <h2 id="modal-title">Nova tarefa</h2>
+      <button class="mini" id="modal-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-b">
+      <div class="field">
+        <label for="m-title">Título *</label>
+        <input type="text" id="m-title" placeholder="Ex.: Enviar proposta da licitação">
+      </div>
+      <div class="field">
+        <label>Prioridade</label>
+        <div class="prio-pick" id="m-prio">
+          <div class="prio-opt alta" data-v="alta" role="button" tabindex="0" aria-pressed="false">Alta</div>
+          <div class="prio-opt media" data-v="media" role="button" tabindex="0" aria-pressed="true">Média</div>
+          <div class="prio-opt baixa" data-v="baixa" role="button" tabindex="0" aria-pressed="false">Baixa</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="m-cat">Categoria</label>
+          <select id="m-cat"></select>
+        </div>
+        <div class="field">
+          <label for="m-due">Prazo</label>
+          <input type="date" id="m-due">
+        </div>
+      </div>
+      <div class="field">
+        <label for="m-resp">Responsável</label>
+        <input type="text" id="m-resp" placeholder="Ex.: Rafael" list="resp-list">
+        <datalist id="resp-list"></datalist>
+      </div>
+      <div class="field">
+        <label for="m-notes">Anotações</label>
+        <textarea id="m-notes" placeholder="Detalhes, links, observações…"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" id="modal-del" hidden style="color:var(--danger);border-color:var(--danger)">Excluir</button>
+      <span style="flex:1"></span>
+      <button class="btn" id="modal-cancel">Cancelar</button>
+      <button class="btn primary" id="modal-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+  const KEY = "central-tarefas-v1", TKEY = "central-tarefas-theme";
+
+  const CATS = [
+    { id: "licitacao", label: "Licitação", v: "--c-licitacao" },
+    { id: "producao", label: "Produção/Oficina", v: "--c-producao" },
+    { id: "financeiro", label: "Financeiro", v: "--c-financeiro" },
+    { id: "comercial", label: "Comercial", v: "--c-comercial" },
+    { id: "fundicao", label: "Fundição", v: "--c-fundicao" },
+    { id: "fornecedores", label: "Fornecedores", v: "--c-fornecedores" },
+    { id: "pessoal", label: "Pessoal", v: "--c-pessoal" },
+    { id: "outros", label: "Outros", v: "--c-outros" },
+  ];
+  const CATMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
+  const PRIO_ORDER = { alta: 0, media: 1, baixa: 2 };
+  const PRIO_LABEL = { alta: "Alta", media: "Média", baixa: "Baixa" };
+  const CK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M20 6 9 17l-5-5"/></svg>';
+  const CKS = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  let tasks = [];
+  let opened = {};
+  let editingId = null, modalPrio = "media";
+  const filter = { cat: "", prio: "", status: "", search: "" };
+  let sortBy = "prazo";
+
+  const $ = s => document.querySelector(s);
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + Math.random().toString(36).slice(2));
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  /* dates */
+  function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function offsetStr(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function dayDiff(due){ if(!due) return null; const t=new Date(todayStr()+"T00:00:00"), d=new Date(due+"T00:00:00"); return Math.round((d-t)/86400000); }
+  function fmtDue(due){
+    if(!due) return ""; const dd=dayDiff(due);
+    const s=new Date(due+"T00:00:00").toLocaleDateString("pt-BR",{day:"2-digit",month:"short"});
+    if(dd===0) return "Hoje"; if(dd===1) return "Amanhã"; if(dd===-1) return "Ontem";
+    if(dd<0) return s+" ("+Math.abs(dd)+"d atraso)"; if(dd<=7) return s+" ("+dd+"d)"; return s;
+  }
+
+  /* persistence — localStorage */
+  function persist(){ try { localStorage.setItem(KEY, JSON.stringify({ tasks })); } catch(e){} }
+  function load(){
+    let raw=null; try { raw=localStorage.getItem(KEY); } catch(e){}
+    if(raw){ try { const d=JSON.parse(raw); tasks=Array.isArray(d.tasks)?d.tasks:[]; return; } catch(e){} }
+    tasks = seedExamples(); persist();
+  }
+  function seedExamples(){
+    return [
+      { id:uid(), title:"Enviar proposta — Carta Convite Goiasa (válvulas 4 vias)", category:"licitacao", priority:"alta", due:offsetStr(-2), responsavel:"Rafael", notes:"Exemplo — pode editar ou excluir. Conferir preço e prazo antes de enviar.", done:false, createdAt:Date.now()-50000, checklist:[{id:uid(),text:"Revisar planilha de custos",done:true},{id:uid(),text:"Anexar ficha técnica",done:false},{id:uid(),text:"Enviar por e-mail",done:false}] },
+      { id:uid(), title:"Cobrar retorno DMAE Poços de Caldas", category:"financeiro", priority:"alta", due:todayStr(), responsavel:"Rafael", notes:"Exemplo — pode editar ou excluir.", done:false, createdAt:Date.now()-40000, checklist:[] },
+      { id:uid(), title:"Acompanhar recebimento de válvulas na oficina", category:"producao", priority:"media", due:offsetStr(5), responsavel:"", notes:"Exemplo — pode editar ou excluir.", done:false, createdAt:Date.now()-30000, checklist:[{id:uid(),text:"Conferir lista de recebimento",done:false},{id:uid(),text:"Lançar custos",done:false}] },
+      { id:uid(), title:"Cotação de matéria-prima para a fundição", category:"fundicao", priority:"media", due:offsetStr(17), responsavel:"Rafael", notes:"Exemplo — bronze e alumínio.", done:false, createdAt:Date.now()-20000, checklist:[] },
+      { id:uid(), title:"Atualizar cadastro de fornecedor (CRC SANEPAR)", category:"fornecedores", priority:"baixa", due:"", responsavel:"Rafael", notes:"Exemplo — pode editar ou excluir.", done:true, doneAt:Date.now()-10000, createdAt:Date.now()-60000, checklist:[] },
+    ];
+  }
+
+  /* CRUD */
+  function save(){ persist(); render(); }
+  function toggleDone(id){ const t=tasks.find(x=>x.id===id); if(!t) return; t.done=!t.done; t.doneAt=t.done?Date.now():null; save(); }
+  function toggleCheck(id,ci){ const t=tasks.find(x=>x.id===id); if(!t||!t.checklist) return; t.checklist[ci].done=!t.checklist[ci].done; save(); }
+  function addCheckItem(id,text){ const t=tasks.find(x=>x.id===id); if(!t||!text.trim()) return; t.checklist=t.checklist||[]; t.checklist.push({id:uid(),text:text.trim(),done:false}); save(); }
+  function delCheckItem(id,ci){ const t=tasks.find(x=>x.id===id); if(!t) return; t.checklist.splice(ci,1); save(); }
+  function removeTask(id){ tasks=tasks.filter(x=>x.id!==id); save(); }
+
+  function respNames(){ const s=new Set(); tasks.forEach(t=>{ if(t.responsavel) s.add(t.responsavel); }); return [...s]; }
+
+  function computeStats(){
+    let late=0,today=0,week=0,done=0;
+    tasks.forEach(t=>{ if(t.done){done++;return;} const dd=dayDiff(t.due); if(dd===null) return; if(dd<0) late++; else if(dd===0) today++; else if(dd<=7) week++; });
+    return {late,today,week,done};
+  }
+  function renderStats(){
+    const s=computeStats();
+    const cards=[
+      {k:"atrasadas",cls:"s-late",n:s.late,lbl:"Atrasadas"},
+      {k:"hoje",cls:"s-today",n:s.today,lbl:"Para hoje"},
+      {k:"semana",cls:"s-week",n:s.week,lbl:"Próx. 7 dias"},
+      {k:"concluidas",cls:"s-done",n:s.done,lbl:"Concluídas"},
+    ];
+    $("#stats").innerHTML=cards.map(c=>`<button class="stat ${c.cls} ${filter.status===c.k?"active":""}" data-status="${c.k}"><div class="n">${c.n}</div><div class="lbl">${c.lbl}</div></button>`).join("");
+  }
+
+  function passFilter(t){
+    if(filter.cat && t.category!==filter.cat) return false;
+    if(filter.prio && t.priority!==filter.prio) return false;
+    if(filter.search){ const q=filter.search.toLowerCase(); if(!((t.title+" "+(t.notes||"")+" "+(t.responsavel||"")).toLowerCase().includes(q))) return false; }
+    const dd=dayDiff(t.due);
+    if(filter.status==="atrasadas") return !t.done && dd!==null && dd<0;
+    if(filter.status==="hoje") return !t.done && dd===0;
+    if(filter.status==="semana") return !t.done && dd!==null && dd>=0 && dd<=7;
+    if(filter.status==="concluidas") return t.done;
+    return true;
+  }
+  function bucketOf(t){
+    if(t.done) return {key:"done",name:"Concluídas",order:99};
+    const dd=dayDiff(t.due);
+    if(dd===null) return {key:"none",name:"Sem prazo",order:6};
+    if(dd<0) return {key:"late",name:"Atrasadas",order:0};
+    if(dd===0) return {key:"today",name:"Para hoje",order:1};
+    if(dd===1) return {key:"tom",name:"Amanhã",order:2};
+    if(dd<=7) return {key:"week",name:"Próximos 7 dias",order:3};
+    if(dd<=30) return {key:"month",name:"Este mês",order:4};
+    return {key:"later",name:"Mais tarde",order:5};
+  }
+  function dueCmp(x,y){ if(!x.due&&!y.due) return 0; if(!x.due) return 1; if(!y.due) return -1; return x.due.localeCompare(y.due); }
+  function sortTasks(arr){
+    const a=arr.slice();
+    if(sortBy==="prioridade") a.sort((x,y)=>(x.done-y.done)||(PRIO_ORDER[x.priority]-PRIO_ORDER[y.priority])||dueCmp(x,y));
+    else if(sortBy==="categoria") a.sort((x,y)=>(x.done-y.done)||(x.category||"").localeCompare(y.category||"")||dueCmp(x,y));
+    else if(sortBy==="criacao") a.sort((x,y)=>(x.done-y.done)||((y.createdAt||0)-(x.createdAt||0)));
+    else a.sort((x,y)=>(x.done-y.done)||dueCmp(x,y)||(PRIO_ORDER[x.priority]-PRIO_ORDER[y.priority]));
+    return a;
+  }
+
+  function taskHTML(t){
+    const cat=CATMAP[t.category]||CATMAP.outros, catColor=`var(${cat.v})`, dd=dayDiff(t.due);
+    let dueCls="due"; if(!t.done&&dd!==null&&dd<0) dueCls+=" late"; else if(!t.done&&dd===0) dueCls+=" today";
+    const cl=t.checklist||[], clDone=cl.filter(i=>i.done).length, isOpen=opened[t.id];
+    const meta=[];
+    meta.push(`<span class="chip cat"><span class="dot"></span>${cat.label}</span>`);
+    meta.push(`<span class="chip prio ${t.priority}">${PRIO_LABEL[t.priority]||"Média"}</span>`);
+    if(t.due) meta.push(`<span class="chip ${dueCls}">${fmtDue(t.due)}</span>`);
+    if(t.responsavel) meta.push(`<span class="resp">👤 ${esc(t.responsavel)}</span>`);
+    if(cl.length) meta.push(`<span class="clist-badge">☑ ${clDone}/${cl.length}</span>`);
+    const clHTML=cl.map((i,ci)=>`<div class="cl-item ${i.done?"checked":""}"><button class="cl-box" data-check="${t.id}" data-ci="${ci}" aria-label="marcar item">${CKS}</button><span class="cl-text">${esc(i.text)}</span><button class="cl-del" data-delcheck="${t.id}" data-ci="${ci}" aria-label="remover item">✕</button></div>`).join("");
+    return `<div class="task ${t.done?"done":""} ${isOpen?"open":""}" style="--cat:${catColor}" data-id="${t.id}">
+      <div class="task-main">
+        <button class="task-check" data-toggle="${t.id}" aria-label="concluir tarefa">${CK}</button>
+        <div class="task-body" data-openbtn="${t.id}" style="cursor:pointer">
+          <div class="task-title">${esc(t.title)}</div>
+          <div class="task-meta">${meta.join("")}</div>
+        </div>
+        <div class="task-side">
+          <button class="mini" data-openbtn="${t.id}" aria-label="expandir"><svg class="caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+          <button class="mini" data-edit="${t.id}" aria-label="editar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        </div>
+      </div>
+      <div class="task-expand">
+        ${t.notes?`<div class="sec-label">Anotações</div><div class="notes-block">${esc(t.notes)}</div>`:""}
+        <div class="sec-label">Checklist</div>
+        <div class="clist">${clHTML||'<span style="color:var(--ink-3);font-size:13px">Nenhum item ainda.</span>'}</div>
+        <div class="cl-add"><input type="text" placeholder="Adicionar item…" data-clinput="${t.id}"><button class="btn" data-cladd="${t.id}">Add</button></div>
+      </div>
+    </div>`;
+  }
+
+  function render(){
+    const fcat=$("#f-cat");
+    if(fcat.options.length<=1) CATS.forEach(c=>{ const o=document.createElement("option"); o.value=c.id; o.textContent=c.label; fcat.appendChild(o); });
+    renderStats();
+    const visible=tasks.filter(passFilter), list=$("#list");
+    if(tasks.length===0){ list.innerHTML=`<div class="empty"><div class="big">🗂️</div><h3>Nenhuma tarefa ainda</h3><p>Comece adicionando sua primeira tarefa.</p><button class="btn primary" id="empty-add">＋ Nova tarefa</button></div>`; const b=$("#empty-add"); if(b) b.onclick=()=>openModal(null); return; }
+    if(visible.length===0){ list.innerHTML=`<div class="empty"><div class="big">🔍</div><h3>Nada encontrado</h3><p>Nenhuma tarefa com esses filtros.</p></div>`; return; }
+    const sorted=sortTasks(visible); let html="";
+    if(sortBy==="prazo" && !filter.status){
+      const groups={};
+      sorted.forEach(t=>{ const b=bucketOf(t); (groups[b.key]=groups[b.key]||{b,items:[]}).items.push(t); });
+      Object.values(groups).sort((a,b)=>a.b.order-b.b.order).forEach(g=>{
+        const cls=g.b.key==="late"?"late":g.b.key==="today"?"today":"";
+        html+=`<div class="group-h ${cls}"><span class="name">${g.b.name}</span><span class="count">${g.items.length}</span><span class="bar"></span></div>`;
+        html+=g.items.map(taskHTML).join("");
+      });
+    } else html=sorted.map(taskHTML).join("");
+    list.innerHTML=html;
+  }
+
+  /* modal */
+  function fillCatSelect(){ $("#m-cat").innerHTML=CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join(""); }
+  function setModalPrio(v){ modalPrio=v; document.querySelectorAll("#m-prio .prio-opt").forEach(o=>o.setAttribute("aria-pressed", o.dataset.v===v?"true":"false")); }
+  function openModal(id){
+    editingId=id||null; const t=id?tasks.find(x=>x.id===id):null;
+    $("#modal-title").textContent=t?"Editar tarefa":"Nova tarefa";
+    $("#m-title").value=t?t.title:""; $("#m-title").style.borderColor="";
+    $("#m-cat").value=t?(t.category||"outros"):"producao";
+    $("#m-due").value=t?(t.due||""):""; $("#m-resp").value=t?(t.responsavel||""):""; $("#m-notes").value=t?(t.notes||""):"";
+    setModalPrio(t?(t.priority||"media"):"media");
+    $("#modal-del").hidden=!t;
+    $("#resp-list").innerHTML=respNames().map(n=>`<option value="${esc(n)}"></option>`).join("");
+    $("#backdrop").classList.add("show"); setTimeout(()=>$("#m-title").focus(),40);
+  }
+  function closeModal(){ $("#backdrop").classList.remove("show"); editingId=null; }
+  function saveFromModal(){
+    const title=$("#m-title").value.trim();
+    if(!title){ $("#m-title").focus(); $("#m-title").style.borderColor="var(--danger)"; return; }
+    let t;
+    if(editingId){ t=tasks.find(x=>x.id===editingId); if(!t){ t={id:editingId,createdAt:Date.now(),done:false,checklist:[]}; tasks.push(t); } }
+    else { t={id:uid(),createdAt:Date.now(),done:false,checklist:[]}; tasks.push(t); }
+    t.title=title; t.category=$("#m-cat").value; t.priority=modalPrio;
+    t.due=$("#m-due").value||""; t.responsavel=$("#m-resp").value.trim(); t.notes=$("#m-notes").value.trim();
+    save(); closeModal(); toast(editingId?"Tarefa atualizada":"Tarefa criada");
+  }
+
+  /* toast */
+  let toastT; function toast(msg){ const el=$("#toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),2000); }
+
+  /* backup / restore */
+  function backup(){
+    const blob=new Blob([JSON.stringify({app:"central-de-tarefas",version:1,exportedAt:new Date().toISOString(),tasks},null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download="tarefas-backup-"+todayStr()+".json"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000); toast("Backup baixado");
+  }
+  function restore(file){
+    const r=new FileReader();
+    r.onload=()=>{
+      try {
+        const d=JSON.parse(r.result); const imp=Array.isArray(d)?d:(d.tasks||[]);
+        if(!Array.isArray(imp)||!imp.length){ toast("Backup vazio ou inválido"); return; }
+        const byId={}; tasks.forEach(t=>byId[t.id]=t);
+        let add=0; imp.forEach(t=>{ if(t&&t.id&&t.title){ byId[t.id]=Object.assign(byId[t.id]||{},t); add++; } });
+        tasks=Object.values(byId); save(); toast(add+" tarefa(s) restauradas");
+      } catch(e){ toast("Arquivo inválido"); }
+    };
+    r.readAsText(file);
+  }
+
+  /* events */
+  function closeMenu(){ $("#menu").hidden=true; }
+  function bind(){
+    $("#add-btn").addEventListener("click",()=>openModal(null));
+    $("#modal-close").addEventListener("click",closeModal);
+    $("#modal-cancel").addEventListener("click",closeModal);
+    $("#modal-save").addEventListener("click",saveFromModal);
+    $("#backdrop").addEventListener("click",e=>{ if(e.target===$("#backdrop")) closeModal(); });
+    $("#modal-del").addEventListener("click",()=>{ if(editingId&&confirm("Excluir esta tarefa?")){ removeTask(editingId); closeModal(); toast("Tarefa excluída"); } });
+    $("#m-title").addEventListener("input",e=>e.target.style.borderColor="");
+    document.querySelectorAll("#m-prio .prio-opt").forEach(o=>{
+      o.addEventListener("click",()=>setModalPrio(o.dataset.v));
+      o.addEventListener("keydown",e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); setModalPrio(o.dataset.v);} });
+    });
+    document.addEventListener("keydown",e=>{
+      if(e.key==="Escape"){ closeModal(); closeMenu(); }
+      if(e.key==="Enter"&&$("#backdrop").classList.contains("show")&&document.activeElement.id==="m-title") saveFromModal();
+    });
+
+    $("#search").addEventListener("input",e=>{ filter.search=e.target.value; render(); });
+    $("#f-cat").addEventListener("change",e=>{ filter.cat=e.target.value; render(); });
+    $("#f-prio").addEventListener("change",e=>{ filter.prio=e.target.value; render(); });
+    $("#sort").addEventListener("change",e=>{ sortBy=e.target.value; render(); });
+    $("#stats").addEventListener("click",e=>{ const b=e.target.closest(".stat"); if(!b) return; filter.status=filter.status===b.dataset.status?"":b.dataset.status; render(); });
+
+    $("#list").addEventListener("click",e=>{
+      let el;
+      if((el=e.target.closest("[data-toggle]"))){ toggleDone(el.dataset.toggle); return; }
+      if((el=e.target.closest("[data-edit]"))){ openModal(el.dataset.edit); return; }
+      if((el=e.target.closest("[data-check]"))){ toggleCheck(el.dataset.check,+el.dataset.ci); return; }
+      if((el=e.target.closest("[data-delcheck]"))){ delCheckItem(el.dataset.delcheck,+el.dataset.ci); return; }
+      if((el=e.target.closest("[data-cladd]"))){ const inp=document.querySelector(`[data-clinput="${el.dataset.cladd}"]`); addCheckItem(el.dataset.cladd,inp.value); return; }
+      if((el=e.target.closest("[data-openbtn]"))){ opened[el.dataset.openbtn]=!opened[el.dataset.openbtn]; render(); return; }
+    });
+    $("#list").addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.matches("[data-clinput]")) addCheckItem(e.target.dataset.clinput,e.target.value); });
+
+    // theme
+    $("#theme-btn").addEventListener("click",()=>{
+      const root=document.documentElement, cur=root.getAttribute("data-theme");
+      const isDark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const next=isDark?"light":"dark"; root.setAttribute("data-theme",next);
+      try{ localStorage.setItem(TKEY,next); }catch(e){}
+    });
+
+    // menu
+    $("#menu-btn").addEventListener("click",e=>{ e.stopPropagation(); $("#menu").hidden=!$("#menu").hidden; });
+    document.addEventListener("click",e=>{ if(!e.target.closest("#menu")&&!e.target.closest("#menu-btn")) closeMenu(); });
+    $("#m-backup").addEventListener("click",()=>{ backup(); closeMenu(); });
+    $("#m-restore").addEventListener("click",()=>{ $("#restore-input").click(); closeMenu(); });
+    $("#restore-input").addEventListener("change",e=>{ const f=e.target.files[0]; if(f) restore(f); e.target.value=""; });
+    $("#m-clear-done").addEventListener("click",()=>{ closeMenu(); const n=tasks.filter(t=>t.done).length; if(!n){ toast("Nenhuma concluída"); return; } if(confirm("Remover "+n+" tarefa(s) concluída(s)?")){ tasks=tasks.filter(t=>!t.done); save(); toast("Concluídas removidas"); } });
+    $("#m-wipe").addEventListener("click",()=>{ closeMenu(); if(confirm("Apagar TODAS as tarefas? Faça um backup antes se quiser guardar.")){ tasks=[]; save(); toast("Tudo apagado"); } });
+  }
+
+  /* init */
+  try { const th=localStorage.getItem(TKEY); if(th) document.documentElement.setAttribute("data-theme",th); } catch(e){}
+  fillCatSelect(); bind(); load(); render();
+})();
+</script>
+</body>
+</html>
