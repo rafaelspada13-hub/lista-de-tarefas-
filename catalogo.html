@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catálogo de Válvulas</title>
+<meta name="description" content="Catálogo de válvulas, atuadores e controles com filtros, busca, paginação e lista de cotação.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d9772b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+<style>
+  :root {
+    --bg: #eceef1; --surface: #ffffff; --surface-2: #f5f6f8;
+    --line: #d9dde3; --line-strong: #c2c8d1;
+    --ink: #1c2530; --ink-2: #4a5563; --ink-3: #7a8493;
+    --accent: #d9772b; --accent-ink: #ffffff; --accent-soft: #fbe9da;
+    --ok: #2f8256; --ok-soft: #dcefe3;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 4px 14px rgba(20,30,45,.06);
+    --shadow-lg: 0 10px 40px rgba(20,30,45,.22);
+    --radius: 12px;
+    --c-valvulas: #2f6fb8; --c-atuadores: #c07514; --c-controles: #157e7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161c; --surface: #1b2129; --surface-2: #222a34;
+      --line: #2e3742; --line-strong: #3b4653;
+      --ink: #e7ebf0; --ink-2: #aeb7c2; --ink-3: #7e8895;
+      --accent: #e88a3d; --accent-ink: #1a1206; --accent-soft: #3a2614;
+      --ok: #57b183; --ok-soft: #16301f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+      --shadow-lg: 0 12px 44px rgba(0,0,0,.55);
+      --c-valvulas: #5b9de0; --c-atuadores: #e0a24f; --c-controles: #45b0ab;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161c; --surface: #1b2129; --surface-2: #222a34;
+    --line: #2e3742; --line-strong: #3b4653;
+    --ink: #e7ebf0; --ink-2: #aeb7c2; --ink-3: #7e8895;
+    --accent: #e88a3d; --accent-ink: #1a1206; --accent-soft: #3a2614;
+    --ok: #57b183; --ok-soft: #16301f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+    --shadow-lg: 0 12px 44px rgba(0,0,0,.55);
+    --c-valvulas: #5b9de0; --c-atuadores: #e0a24f; --c-controles: #45b0ab;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  [hidden] { display: none !important; }
+  h1, h2, h3 { font-family: "Archivo", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+  .mono { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 80px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .glyph { width: 42px; height: 42px; border-radius: 11px; flex: none; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 22px; box-shadow: var(--shadow); }
+  .brand h1 { font-size: 23px; margin: 0; line-height: 1.1; }
+  .brand .sub { color: var(--ink-3); font-size: 12.5px; margin-top: 2px; }
+  .head-actions { display: flex; align-items: center; gap: 8px; }
+
+  .btn { font: inherit; font-weight: 600; cursor: pointer; border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 9px 14px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; transition: transform .06s ease, border-color .15s; }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.icon { padding: 9px 11px; }
+  .btn.small { padding: 6px 10px; font-size: 13px; }
+  .btn:disabled { opacity: .45; cursor: default; transform: none; }
+  .btn:focus-visible, input:focus-visible, select:focus-visible, .chk:focus-within, .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .badge { background: var(--accent); color: var(--accent-ink); border-radius: 20px; font-size: 12px; padding: 0 7px; min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  input, select { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px; }
+  select { cursor: pointer; }
+
+  /* breadcrumb + category tabs */
+  .crumbs { font-size: 13px; color: var(--ink-3); margin-bottom: 10px; }
+  .crumbs b { color: var(--ink-2); font-weight: 600; }
+  .cats { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 11px; padding: 4px; margin-bottom: 16px; overflow-x: auto; }
+  .cat { flex: 1; white-space: nowrap; text-align: center; padding: 9px 12px; border-radius: 8px; border: none; background: transparent; color: var(--ink-2); font: inherit; font-weight: 600; cursor: pointer; }
+  .cat[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .cat .n { color: var(--ink-3); font-weight: 500; font-size: 12.5px; margin-left: 4px; }
+
+  .layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; align-items: start; }
+
+  /* filters */
+  .filters { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 14px 14px; box-shadow: var(--shadow); position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; }
+  .filters-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 4px; }
+  .filters-head h2 { font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+  .link { background: none; border: none; color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 0; }
+  .fgroup { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+  .fgroup h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin: 0 0 6px; }
+  .chk { display: flex; align-items: center; gap: 8px; padding: 4px 2px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  .chk input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+  .chk .cnt { margin-left: auto; color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .chk.zero { opacity: .45; }
+
+  /* toolbar */
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+  .search { position: relative; flex: 1 1 220px; min-width: 150px; }
+  .search input { width: 100%; padding-left: 34px; }
+  .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); }
+  .result-info { font-size: 13px; color: var(--ink-3); margin: 0 2px 10px; }
+  .result-info b { color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--ink); border: 1px solid transparent; border-radius: 20px; padding: 3px 6px 3px 11px; font-size: 13px; font: inherit; font-size: 13px; cursor: pointer; }
+  .chip span { color: var(--ink-3); font-weight: 700; }
+  #filters-toggle { display: none; }
+
+  /* grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .thumb { aspect-ratio: 4 / 3; background: var(--surface-2); border-bottom: 1px solid var(--line); display: grid; place-items: center; color: var(--cat); position: relative; }
+  .thumb svg { width: 52%; height: auto; }
+  .thumb .tag { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; background: var(--surface); color: var(--cat); border: 1px solid var(--line); border-radius: 20px; padding: 1px 8px; }
+  .card-body { padding: 12px 13px 13px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card-body .series { font-size: 12px; color: var(--ink-3); }
+  .card-body h3 { margin: 0; font-size: 15.5px; line-height: 1.3; }
+  .specs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .spec { font-size: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; color: var(--ink-2); }
+  .card-foot { margin-top: auto; padding-top: 8px; display: flex; gap: 6px; }
+  .card-foot .btn { flex: 1; justify-content: center; }
+  .btn.added { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+
+  .empty { text-align: center; padding: 50px 20px; color: var(--ink-3); background: var(--surface); border: 1px dashed var(--line-strong); border-radius: var(--radius); }
+
+  /* pagination */
+  .pager { display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 20px; flex-wrap: wrap; }
+  .pager button { min-width: 38px; justify-content: center; }
+  .pager button[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .pager .gap { color: var(--ink-3); padding: 0 4px; }
+
+  /* dialogs / drawer */
+  .overlay { position: fixed; inset: 0; background: rgba(10,15,22,.5); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .dialog { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-lg); width: min(760px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; }
+  .dialog-grid { display: grid; grid-template-columns: 1fr 1.2fr; }
+  .dialog .thumb { aspect-ratio: auto; min-height: 100%; border-bottom: none; border-right: 1px solid var(--line); padding: 30px; }
+  .dialog-body { padding: 20px 22px 22px; }
+  .dialog-body h2 { margin: 2px 0 6px; font-size: 22px; }
+  .dialog-body p { color: var(--ink-2); margin: 0 0 14px; }
+  .close { float: right; }
+  table.spec-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 16px; }
+  .spec-table th { text-align: left; color: var(--ink-3); font-weight: 500; padding: 6px 10px 6px 0; width: 45%; border-bottom: 1px solid var(--line); }
+  .spec-table td { padding: 6px 0; border-bottom: 1px solid var(--line); font-weight: 600; }
+  .feats { margin: 0 0 16px; padding-left: 18px; color: var(--ink-2); font-size: 14px; }
+
+  .drawer-wrap { justify-content: flex-end; align-items: stretch; padding: 0; }
+  .drawer { background: var(--surface); width: min(420px, 100%); height: 100%; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
+  .drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .drawer-head h2 { margin: 0; font-size: 18px; }
+  .drawer-list { flex: 1; overflow-y: auto; padding: 10px 18px; }
+  .q-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .q-item .info { flex: 1; min-width: 0; }
+  .q-item .info b { display: block; font-size: 14px; }
+  .q-item .info small { color: var(--ink-3); }
+  .q-item input { width: 64px; text-align: center; }
+  .drawer-foot { padding: 14px 18px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+  .drawer-foot .btn { justify-content: center; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 9px; font-size: 14px; z-index: 70; box-shadow: var(--shadow-lg); }
+
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    .filters { position: static; max-height: none; }
+    .filters:not(.open) { display: none; }
+    #filters-toggle { display: inline-flex; }
+    .dialog-grid { grid-template-columns: 1fr; }
+    .dialog .thumb { border-right: none; border-bottom: 1px solid var(--line); min-height: 180px; padding: 20px; }
+    .dialog .thumb svg { width: 34%; }
+  }
+  @media (max-width: 520px) {
+    .lbltxt { display: none; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+    .card-body h3 { font-size: 14px; }
+    .card-foot .btn .lbltxt { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="glyph">🔧</div>
+      <div>
+        <h1>Catálogo de Válvulas</h1>
+        <div class="sub">Válvulas, atuadores e controles</div>
+      </div>
+    </div>
+    <div class="head-actions">
+      <a class="btn" href="index.html" title="Voltar para a Central de Tarefas">📋<span class="lbltxt">Tarefas</span></a>
+      <button class="btn icon" id="theme-btn" title="Tema claro/escuro" aria-label="Alternar tema">🌗</button>
+      <button class="btn primary" id="quote-btn">🧾<span class="lbltxt">Cotação</span><span class="badge" id="quote-count">0</span></button>
+    </div>
+  </header>
+
+  <div class="crumbs">Início › <b id="crumb-cat">Todos os produtos</b></div>
+  <div class="cats" role="tablist" id="cats"></div>
+
+  <div class="layout">
+    <aside class="filters" id="filters" aria-label="Filtros">
+      <div class="filters-head"><h2>Filtros</h2><button class="link" id="clear-filters">Limpar</button></div>
+      <div id="facets"></div>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <button class="btn" id="filters-toggle">⚙️ Filtros</button>
+        <label class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="q" placeholder="Buscar por nome, série ou aplicação…" aria-label="Buscar">
+        </label>
+        <select id="sort" aria-label="Ordenar">
+          <option value="relevancia">Relevância</option>
+          <option value="nome">Nome (A–Z)</option>
+          <option value="dn-asc">Diâmetro (menor)</option>
+          <option value="dn-desc">Diâmetro (maior)</option>
+          <option value="pressao">Pressão (maior)</option>
+        </select>
+        <select id="per-page" aria-label="Itens por página">
+          <option value="12">12 / pág.</option>
+          <option value="24">24 / pág.</option>
+          <option value="48">48 / pág.</option>
+        </select>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="result-info" id="result-info"></div>
+      <div class="grid" id="grid"></div>
+      <nav class="pager" id="pager" aria-label="Paginação"></nav>
+    </main>
+  </div>
+</div>
+
+<div class="overlay" id="detail" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="d-title" id="detail-box"></div></div>
+
+<div class="overlay drawer-wrap" id="quote" hidden>
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="q-title">
+    <div class="drawer-head"><h2 id="q-title">Lista de cotação</h2><button class="btn icon" id="quote-close" aria-label="Fechar">✕</button></div>
+    <div class="drawer-list" id="quote-list"></div>
+    <div class="drawer-foot">
+      <button class="btn primary" id="quote-copy">📋 Copiar pedido</button>
+      <button class="btn" id="quote-download">⬇️ Baixar (.csv)</button>
+      <button class="link" id="quote-clear">Esvaziar lista</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const QKEY = "catalogo-cotacao-v1", TKEY = "central-tarefas-theme";
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ---------- ícones (SVG simples por tipo) ---------- */
+  const ICONS = {
+    borboleta: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><circle cx="50" cy="55" r="30"/><path d="M50 25v60M38 40c8 6 16 6 24 0M38 70c8-6 16-6 24 0"/><rect x="44" y="8" width="12" height="17" rx="2"/></svg>',
+    esfera: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="10" y="40" width="80" height="30" rx="4"/><circle cx="50" cy="55" r="18"/><path d="M50 37V20M36 20h40"/></svg>',
+    retencao: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="10" y="35" width="80" height="40" rx="6"/><path d="M40 40l20 15-20 15z" fill="currentColor"/><path d="M10 55H0M90 55h10"/></svg>',
+    gaveta: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><path d="M10 60h80"/><rect x="30" y="45" width="40" height="35" rx="4"/><path d="M50 45V18"/><circle cx="50" cy="14" r="8"/><path d="M10 50v20M90 50v20"/></svg>',
+    pneumatico: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="12" y="30" width="76" height="40" rx="8"/><path d="M30 30v40M70 30v40M50 70v18M40 88h20"/><circle cx="50" cy="50" r="6"/></svg>',
+    eletrico: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="20" y="18" width="60" height="52" rx="6"/><path d="M52 28l-12 20h14l-10 16" stroke-linejoin="round"/><path d="M50 70v14M38 84h24"/></svg>',
+    posicionador: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="16" y="20" width="68" height="60" rx="8"/><rect x="28" y="32" width="44" height="20" rx="3"/><circle cx="36" cy="66" r="4"/><circle cx="50" cy="66" r="4"/><circle cx="64" cy="66" r="4"/></svg>',
+    fimdecurso: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="22" y="30" width="56" height="50" rx="8"/><path d="M50 30V16"/><circle cx="50" cy="55" r="14"/><path d="M50 55l9-7"/></svg>',
+    solenoide: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="30" y="12" width="40" height="40" rx="5"/><path d="M38 22h24M38 32h24M38 42h24"/><rect x="18" y="52" width="64" height="24" rx="4"/><path d="M18 64H6M82 64h12"/></svg>',
+  };
+
+  /* ---------- dados de exemplo ---------- */
+  const CATEGORIES = [
+    { id: "valvulas", nome: "Válvulas" },
+    { id: "atuadores", nome: "Atuadores" },
+    { id: "controles", nome: "Controles e acessórios" },
+  ];
+  const TYPE_LABEL = {
+    borboleta: "Borboleta", esfera: "Esfera", retencao: "Retenção", gaveta: "Gaveta",
+    pneumatico: "Pneumático", eletrico: "Elétrico",
+    posicionador: "Posicionador", fimdecurso: "Chave fim de curso", solenoide: "Válvula solenoide",
+  };
+
+  // Cada série gera uma variação por tamanho; os dados são ilustrativos, não de um fabricante real.
+  const SERIES = [
+    { cat: "valvulas", tipo: "borboleta", serie: "VB-20", nome: "Válvula borboleta wafer", material: "Ferro fundido", conexao: "Wafer", pressao: 16, temp: "-20 a 120 °C", dns: [50, 80, 100, 150, 200, 300], aplic: ["Água", "HVAC"], desc: "Válvula de uso geral com sede resiliente em EPDM, para controle e bloqueio em linhas de água e climatização.", feats: ["Sede substituível em campo", "Haste em aço inox", "Flange de topo ISO 5211 para automação direta"] },
+    { cat: "valvulas", tipo: "borboleta", serie: "VB-30", nome: "Válvula borboleta lug", material: "Ferro dúctil", conexao: "Lug", pressao: 16, temp: "-20 a 140 °C", dns: [80, 100, 150, 200, 250], aplic: ["Água", "Saneamento", "Industrial"], desc: "Corpo tipo lug que permite desmontar a tubulação a jusante sem drenar a linha.", feats: ["Corpo em ferro dúctil revestido em epóxi", "Disco em inox CF8M", "Adequada para fim de linha"] },
+    { cat: "valvulas", tipo: "borboleta", serie: "VB-50", nome: "Válvula borboleta de alta performance", material: "Aço carbono", conexao: "Wafer", pressao: 40, temp: "-29 a 425 °C", dns: [80, 150, 200, 300], aplic: ["Vapor", "Óleo e gás", "Química"], desc: "Projeto de duplo excêntrico com sede metálica para pressões e temperaturas elevadas.", feats: ["Duplo excêntrico, baixo desgaste da sede", "Vedação bidirecional", "Gaxeta ajustável"] },
+    { cat: "valvulas", tipo: "esfera", serie: "VE-10", nome: "Válvula esfera tripartida", material: "Aço inox", conexao: "Rosca", pressao: 63, temp: "-20 a 200 °C", dns: [15, 20, 25, 40, 50], aplic: ["Química", "Alimentos", "Industrial"], desc: "Corpo em três peças para manutenção sem remover as pontas da linha.", feats: ["Passagem plena", "Sedes em PTFE reforçado", "Pontas rosca, solda ou tri-clamp"] },
+    { cat: "valvulas", tipo: "esfera", serie: "VE-40", nome: "Válvula esfera flangeada", material: "Aço carbono", conexao: "Flange", pressao: 40, temp: "-29 a 230 °C", dns: [25, 50, 80, 100, 150], aplic: ["Óleo e gás", "Vapor", "Industrial"], desc: "Válvula bipartida flangeada para bloqueio em linhas de processo.", feats: ["Haste antiexpulsão", "Dispositivo antiestático", "Projeto fire-safe"] },
+    { cat: "valvulas", tipo: "retencao", serie: "VR-12", nome: "Válvula de retenção dupla porta", material: "Ferro dúctil", conexao: "Wafer", pressao: 16, temp: "-10 a 120 °C", dns: [50, 80, 100, 150, 200, 300], aplic: ["Água", "Saneamento", "HVAC"], desc: "Retenção compacta com duas portas e molas que reduz o golpe de aríete.", feats: ["Fechamento rápido por mola", "Baixa perda de carga", "Instalação horizontal ou vertical"] },
+    { cat: "valvulas", tipo: "gaveta", serie: "VG-25", nome: "Válvula gaveta cunha elástica", material: "Ferro dúctil", conexao: "Flange", pressao: 16, temp: "0 a 70 °C", dns: [50, 80, 100, 150, 200], aplic: ["Água", "Saneamento"], desc: "Gaveta com cunha revestida em elastômero para redes de água e saneamento.", feats: ["Passagem plena sem cavidade", "Haste não ascendente", "Revestimento epóxi interno e externo"] },
+    { cat: "atuadores", tipo: "pneumatico", serie: "AP-90", nome: "Atuador pneumático pinhão-cremalheira", material: "Alumínio", conexao: "ISO 5211", pressao: 8, temp: "-20 a 80 °C", torques: [20, 40, 80, 160, 320, 640], modos: ["Dupla ação", "Retorno por mola"], aplic: ["Industrial", "Água", "Química"], desc: "Atuador de 90° para automação de válvulas borboleta e esfera.", feats: ["Interface NAMUR para solenoide e chaves", "Corpo anodizado", "Indicador visual de posição"] },
+    { cat: "atuadores", tipo: "eletrico", serie: "AE-70", nome: "Atuador elétrico 1/4 de volta", material: "Alumínio", conexao: "ISO 5211", pressao: 0, temp: "-20 a 65 °C", torques: [35, 70, 150, 300, 600], modos: ["On/off", "Modulante 4–20 mA"], aplic: ["HVAC", "Água", "Industrial"], desc: "Atuador elétrico com volante manual e chaves de fim de curso integradas.", feats: ["Grau de proteção IP67", "Aquecedor anticondensação", "Alimentação 24 V ou 220 V"] },
+    { cat: "controles", tipo: "posicionador", serie: "CP-4", nome: "Posicionador eletropneumático", material: "Alumínio", conexao: "NAMUR", pressao: 7, temp: "-20 a 80 °C", aplic: ["Industrial", "Química", "Vapor"], desc: "Posiciona atuadores pneumáticos a partir de sinal 4–20 mA.", feats: ["Calibração automática", "Display local", "Comunicação HART"], variantes: ["Simples ação", "Dupla ação"] },
+    { cat: "controles", tipo: "fimdecurso", serie: "CF-2", nome: "Caixa de chaves fim de curso", material: "Alumínio", conexao: "NAMUR", pressao: 0, temp: "-20 a 80 °C", aplic: ["Industrial", "Água", "Óleo e gás"], desc: "Indica remotamente a posição aberta/fechada da válvula.", feats: ["Indicador visual 3D", "Chaves mecânicas ou indutivas", "Grau de proteção IP67"], variantes: ["Mecânica", "Indutiva", "À prova de explosão"] },
+    { cat: "controles", tipo: "solenoide", serie: "CS-3", nome: "Válvula solenoide NAMUR", material: "Alumínio", conexao: "NAMUR", pressao: 10, temp: "-10 a 60 °C", aplic: ["Industrial", "Química"], desc: "Comanda atuadores pneumáticos montada diretamente na interface NAMUR.", feats: ["Comando manual de emergência", "Bobina 24 Vcc ou 220 Vca", "Versão 3/2 e 5/2 vias"], variantes: ["3/2 vias", "5/2 vias"] },
+  ];
+
+  const PRODUCTS = [];
+  for (const s of SERIES) {
+    const base = { cat: s.cat, tipo: s.tipo, serie: s.serie, material: s.material, conexao: s.conexao, pressao: s.pressao, temp: s.temp, aplic: s.aplic, desc: s.desc, feats: s.feats };
+    if (s.dns) for (const dn of s.dns) PRODUCTS.push({ ...base, id: `${s.serie}-DN${dn}`, nome: `${s.nome} DN ${dn}`, dn });
+    else if (s.torques) for (const t of s.torques) for (const m of s.modos) PRODUCTS.push({ ...base, id: `${s.serie}-${t}-${m.slice(0, 3).toUpperCase()}`, nome: `${s.nome} ${t} N·m`, torque: t, modo: m });
+    else for (const v of s.variantes) PRODUCTS.push({ ...base, id: `${s.serie}-${v.replace(/\W+/g, "").toUpperCase()}`, nome: `${s.nome} – ${v}`, modo: v });
+  }
+
+  /* ---------- facetas ---------- */
+  const DN_RANGES = [
+    { id: "ate50", label: "Até DN 50", test: (p) => p.dn <= 50 },
+    { id: "65-150", label: "DN 65 a 150", test: (p) => p.dn > 50 && p.dn <= 150 },
+    { id: "acima150", label: "Acima de DN 150", test: (p) => p.dn > 150 },
+  ];
+  const FACETS = [
+    { key: "tipo", label: "Tipo", values: (p) => [p.tipo], fmt: (v) => TYPE_LABEL[v] },
+    { key: "dn", label: "Diâmetro nominal", values: (p) => (p.dn ? DN_RANGES.filter((r) => r.test(p)).map((r) => r.id) : []), fmt: (v) => DN_RANGES.find((r) => r.id === v).label, order: DN_RANGES.map((r) => r.id) },
+    { key: "material", label: "Material do corpo", values: (p) => [p.material] },
+    { key: "conexao", label: "Conexão", values: (p) => [p.conexao] },
+    { key: "aplic", label: "Aplicação", values: (p) => p.aplic },
+    { key: "modo", label: "Modo de operação", values: (p) => (p.modo ? [p.modo] : []) },
+  ];
+
+  /* ---------- estado (sincronizado com a URL, como ?page=1) ---------- */
+  const state = { cat: "", q: "", sort: "relevancia", per: 12, page: 1, f: {} };
+
+  function readURL() {
+    const u = new URLSearchParams(location.search);
+    state.cat = CATEGORIES.some((c) => c.id === u.get("cat")) ? u.get("cat") : "";
+    state.q = u.get("q") || "";
+    state.sort = u.get("sort") || "relevancia";
+    state.per = [12, 24, 48].includes(+u.get("per")) ? +u.get("per") : 12;
+    state.page = Math.max(1, parseInt(u.get("page"), 10) || 1);
+    state.f = {};
+    for (const fc of FACETS) { const v = u.getAll(fc.key); if (v.length) state.f[fc.key] = new Set(v); }
+  }
+  function writeURL(push) {
+    const u = new URLSearchParams();
+    if (state.cat) u.set("cat", state.cat);
+    if (state.q) u.set("q", state.q);
+    if (state.sort !== "relevancia") u.set("sort", state.sort);
+    if (state.per !== 12) u.set("per", state.per);
+    for (const [k, set] of Object.entries(state.f)) for (const v of set) u.append(k, v);
+    u.set("page", state.page);
+    const url = `${location.pathname}?${u}`;
+    try { push ? history.pushState(null, "", url) : history.replaceState(null, "", url); } catch (e) {}
+  }
+
+  const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const haystack = (p) => norm([p.nome, p.serie, TYPE_LABEL[p.tipo], p.material, p.conexao, ...p.aplic, p.desc, ...p.feats].join(" "));
+  PRODUCTS.forEach((p) => (p._h = haystack(p)));
+
+  function matches(p, skipKey) {
+    if (state.cat && p.cat !== state.cat) return false;
+    if (state.q) { const terms = norm(state.q).split(/\s+/).filter(Boolean); if (!terms.every((t) => p._h.includes(t))) return false; }
+    for (const fc of FACETS) {
+      if (fc.key === skipKey) continue;
+      const sel = state.f[fc.key];
+      if (sel && sel.size && !fc.values(p).some((v) => sel.has(v))) return false;
+    }
+    return true;
+  }
+
+  const SORTS = {
+    relevancia: null,
+    nome: (a, b) => a.nome.localeCompare(b.nome, "pt-BR"),
+    "dn-asc": (a, b) => (a.dn ?? 1e9) - (b.dn ?? 1e9),
+    "dn-desc": (a, b) => (b.dn ?? -1) - (a.dn ?? -1),
+    pressao: (a, b) => b.pressao - a.pressao,
+  };
+
+  /* ---------- lista de cotação ---------- */
+  let quote = {};
+  try { quote = JSON.parse(localStorage.getItem(QKEY)) || {}; } catch (e) { quote = {}; }
+  const saveQuote = () => { try { localStorage.setItem(QKEY, JSON.stringify(quote)); } catch (e) {} };
+  const byId = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
+  for (const id of Object.keys(quote)) if (!byId[id]) delete quote[id];
+
+  function toggleQuote(id) {
+    if (quote[id]) { delete quote[id]; toast("Removido da cotação"); }
+    else { quote[id] = 1; toast("Adicionado à cotação"); }
+    saveQuote(); renderQuoteCount(); renderGrid(); if (!$("#detail").hidden) openDetail(id);
+  }
+  function renderQuoteCount() { $("#quote-count").textContent = Object.keys(quote).length; }
+
+  /* ---------- render ---------- */
+  function specChips(p) {
+    const s = [];
+    if (p.dn) s.push(`DN ${p.dn}`);
+    if (p.torque) s.push(`${p.torque} N·m`);
+    if (p.modo) s.push(p.modo);
+    if (p.pressao) s.push(`${p.pressao} bar`);
+    s.push(p.conexao);
+    return s.map((x) => `<span class="spec">${esc(x)}</span>`).join("");
+  }
+
+  function renderCats() {
+    const base = PRODUCTS.filter((p) => matchesNoCat(p));
+    const tabs = [{ id: "", nome: "Todos" }, ...CATEGORIES];
+    $("#cats").innerHTML = tabs.map((c) => {
+      const n = c.id ? base.filter((p) => p.cat === c.id).length : base.length;
+      return `<button class="cat" role="tab" data-cat="${c.id}" aria-selected="${state.cat === c.id}">${esc(c.nome)}<span class="n">${n}</span></button>`;
+    }).join("");
+    $("#crumb-cat").textContent = state.cat ? CATEGORIES.find((c) => c.id === state.cat).nome : "Todos os produtos";
+  }
+  function matchesNoCat(p) { const c = state.cat; state.cat = ""; const r = matches(p); state.cat = c; return r; }
+
+  function renderFacets() {
+    $("#facets").innerHTML = FACETS.map((fc) => {
+      const pool = PRODUCTS.filter((p) => matches(p, fc.key));
+      const all = new Map();
+      for (const p of PRODUCTS) if (!state.cat || p.cat === state.cat) for (const v of fc.values(p)) all.set(v, 0);
+      for (const p of pool) for (const v of fc.values(p)) all.set(v, (all.get(v) || 0) + 1);
+      if (!all.size) return "";
+      let keys = [...all.keys()];
+      keys = fc.order ? fc.order.filter((k) => all.has(k)) : keys.sort((a, b) => String(fc.fmt ? fc.fmt(a) : a).localeCompare(String(fc.fmt ? fc.fmt(b) : b), "pt-BR"));
+      const sel = state.f[fc.key] || new Set();
+      return `<div class="fgroup"><h3>${esc(fc.label)}</h3>${keys.map((v) => {
+        const n = all.get(v), on = sel.has(v);
+        return `<label class="chk${n || on ? "" : " zero"}"><input type="checkbox" data-facet="${fc.key}" value="${esc(v)}"${on ? " checked" : ""}>${esc(fc.fmt ? fc.fmt(v) : v)}<span class="cnt">${n}</span></label>`;
+      }).join("")}</div>`;
+    }).join("");
+  }
+
+  function renderChips() {
+    const chips = [];
+    for (const fc of FACETS) for (const v of state.f[fc.key] || []) chips.push(`<button class="chip" data-facet="${fc.key}" data-value="${esc(v)}">${esc(fc.fmt ? fc.fmt(v) : v)}<span aria-label="remover">✕</span></button>`);
+    $("#chips").innerHTML = chips.join("");
+  }
+
+  function currentList() {
+    const list = PRODUCTS.filter((p) => matches(p));
+    const cmp = SORTS[state.sort];
+    return cmp ? list.slice().sort(cmp) : list;
+  }
+
+  function renderGrid() {
+    const list = currentList();
+    const pages = Math.max(1, Math.ceil(list.length / state.per));
+    if (state.page > pages) state.page = pages;
+    const start = (state.page - 1) * state.per;
+    const slice = list.slice(start, start + state.per);
+
+    $("#result-info").innerHTML = list.length
+      ? `Mostrando <b>${start + 1}–${start + slice.length}</b> de <b>${list.length}</b> produtos`
+      : "";
+    $("#grid").innerHTML = slice.length ? slice.map((p) => `
+      <article class="card" tabindex="0" data-id="${esc(p.id)}" style="--cat: var(--c-${p.cat})">
+        <div class="thumb"><span class="tag">${esc(TYPE_LABEL[p.tipo])}</span>${ICONS[p.tipo]}</div>
+        <div class="card-body">
+          <div class="series mono">Série ${esc(p.serie)}</div>
+          <h3>${esc(p.nome)}</h3>
+          <div class="specs">${specChips(p)}</div>
+          <div class="card-foot">
+            <button class="btn small${quote[p.id] ? " added" : ""}" data-quote="${esc(p.id)}">${quote[p.id] ? "✓" : "＋"}<span class="lbltxt">${quote[p.id] ? "Na cotação" : "Cotação"}</span></button>
+          </div>
+        </div>
+      </article>`).join("")
+      : `<div class="empty" style="grid-column: 1 / -1">Nenhum produto encontrado com esses filtros.<br><button class="link" id="empty-clear">Limpar filtros e busca</button></div>`;
+    renderPager(pages);
+  }
+
+  function renderPager(pages) {
+    if (pages <= 1) { $("#pager").innerHTML = ""; return; }
+    const p = state.page, nums = new Set([1, pages, p - 1, p, p + 1].filter((n) => n >= 1 && n <= pages));
+    const sorted = [...nums].sort((a, b) => a - b);
+    let html = `<button class="btn small" data-page="${p - 1}" ${p === 1 ? "disabled" : ""} aria-label="Página anterior">‹</button>`;
+    sorted.forEach((n, i) => {
+      if (i && n - sorted[i - 1] > 1) html += `<span class="gap">…</span>`;
+      html += `<button class="btn small" data-page="${n}"${n === p ? ' aria-current="page"' : ""}>${n}</button>`;
+    });
+    html += `<button class="btn small" data-page="${p + 1}" ${p === pages ? "disabled" : ""} aria-label="Próxima página">›</button>`;
+    $("#pager").innerHTML = html;
+  }
+
+  function render() { renderCats(); renderFacets(); renderChips(); renderGrid(); }
+  function update(opts = {}) { if (!opts.keepPage) state.page = 1; render(); writeURL(opts.push); }
+
+  /* ---------- detalhe ---------- */
+  function openDetail(id) {
+    const p = byId[id]; if (!p) return;
+    const rows = [
+      ["Série", p.serie], ["Tipo", TYPE_LABEL[p.tipo]],
+      p.dn && ["Diâmetro nominal", `DN ${p.dn}`],
+      p.torque && ["Torque de saída", `${p.torque} N·m`],
+      p.modo && ["Modo de operação", p.modo],
+      ["Material do corpo", p.material], ["Conexão", p.conexao],
+      p.pressao && [p.cat === "valvulas" ? "Pressão nominal" : "Pressão de alimentação", `${p.pressao} bar`],
+      ["Temperatura", p.temp], ["Aplicações", p.aplic.join(", ")],
+    ].filter(Boolean);
+    $("#detail-box").innerHTML = `
+      <div class="dialog-grid">
+        <div class="thumb" style="--cat: var(--c-${p.cat})">${ICONS[p.tipo]}</div>
+        <div class="dialog-body">
+          <button class="btn icon close" id="detail-close" aria-label="Fechar">✕</button>
+          <div class="series mono" style="color:var(--ink-3);font-size:12px">${esc(p.id)}</div>
+          <h2 id="d-title">${esc(p.nome)}</h2>
+          <p>${esc(p.desc)}</p>
+          <table class="spec-table">${rows.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</table>
+          <ul class="feats">${p.feats.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
+          <button class="btn ${quote[p.id] ? "added" : "primary"}" data-quote="${esc(p.id)}">${quote[p.id] ? "✓ Na lista de cotação" : "＋ Adicionar à cotação"}</button>
+        </div>
+      </div>`;
+    $("#detail").hidden = false;
+    $("#detail-close").focus();
+  }
+
+  /* ---------- drawer de cotação ---------- */
+  function renderQuote() {
+    const ids = Object.keys(quote);
+    $("#quote-list").innerHTML = ids.length ? ids.map((id) => {
+      const p = byId[id];
+      return `<div class="q-item"><div class="info"><b>${esc(p.nome)}</b><small class="mono">${esc(p.id)}</small></div>
+        <input type="number" min="1" value="${quote[id]}" data-qty="${esc(id)}" aria-label="Quantidade">
+        <button class="btn icon small" data-remove="${esc(id)}" aria-label="Remover">✕</button></div>`;
+    }).join("") : `<div class="empty" style="margin-top:10px">Sua lista está vazia.<br>Use “＋ Cotação” nos produtos.</div>`;
+    ["#quote-copy", "#quote-download"].forEach((s) => ($(s).disabled = !ids.length));
+  }
+  const quoteLines = () => Object.keys(quote).map((id) => ({ id, nome: byId[id].nome, qtd: quote[id] }));
+
+  let toastT;
+  function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 1800); }
+
+  /* ---------- eventos ---------- */
+  $("#cats").addEventListener("click", (e) => { const b = e.target.closest("[data-cat]"); if (!b) return; state.cat = b.dataset.cat; state.f = {}; update({ push: true }); });
+  $("#facets").addEventListener("change", (e) => {
+    const i = e.target.closest("[data-facet]"); if (!i) return;
+    const set = state.f[i.dataset.facet] || (state.f[i.dataset.facet] = new Set());
+    i.checked ? set.add(i.value) : set.delete(i.value);
+    if (!set.size) delete state.f[i.dataset.facet];
+    update();
+  });
+  $("#chips").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-facet]"); if (!c) return;
+    const set = state.f[c.dataset.facet]; set.delete(c.dataset.value); if (!set.size) delete state.f[c.dataset.facet];
+    update();
+  });
+  const clearAll = () => { state.f = {}; state.q = ""; $("#q").value = ""; update(); };
+  $("#clear-filters").addEventListener("click", () => { state.f = {}; update(); });
+  let qT; $("#q").addEventListener("input", (e) => { clearTimeout(qT); qT = setTimeout(() => { state.q = e.target.value.trim(); update(); }, 180); });
+  $("#sort").addEventListener("change", (e) => { state.sort = e.target.value; update(); });
+  $("#per-page").addEventListener("change", (e) => { state.per = +e.target.value; update(); });
+  $("#filters-toggle").addEventListener("click", () => $("#filters").classList.toggle("open"));
+
+  $("#pager").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-page]"); if (!b || b.disabled) return;
+    state.page = +b.dataset.page; update({ keepPage: true, push: true });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $("#grid").addEventListener("click", (e) => {
+    const q = e.target.closest("[data-quote]"); if (q) { e.stopPropagation(); toggleQuote(q.dataset.quote); return; }
+    if (e.target.closest("#empty-clear")) { clearAll(); return; }
+    const c = e.target.closest(".card"); if (c) openDetail(c.dataset.id);
+  });
+  $("#grid").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.classList.contains("card")) openDetail(e.target.dataset.id); });
+
+  $("#detail").addEventListener("click", (e) => {
+    if (e.target.id === "detail" || e.target.closest("#detail-close")) { $("#detail").hidden = true; return; }
+    const q = e.target.closest("[data-quote]"); if (q) toggleQuote(q.dataset.quote);
+  });
+
+  $("#quote-btn").addEventListener("click", () => { renderQuote(); $("#quote").hidden = false; $("#quote-close").focus(); });
+  $("#quote").addEventListener("click", (e) => { if (e.target.id === "quote" || e.target.closest("#quote-close")) $("#quote").hidden = true; });
+  $("#quote-list").addEventListener("change", (e) => { const i = e.target.closest("[data-qty]"); if (!i) return; quote[i.dataset.qty] = Math.max(1, parseInt(i.value, 10) || 1); i.value = quote[i.dataset.qty]; saveQuote(); });
+  $("#quote-list").addEventListener("click", (e) => { const b = e.target.closest("[data-remove]"); if (!b) return; delete quote[b.dataset.remove]; saveQuote(); renderQuote(); renderQuoteCount(); renderGrid(); });
+  $("#quote-clear").addEventListener("click", () => { if (!Object.keys(quote).length || !confirm("Esvaziar a lista de cotação?")) return; quote = {}; saveQuote(); renderQuote(); renderQuoteCount(); renderGrid(); });
+  $("#quote-copy").addEventListener("click", async () => {
+    const txt = "Solicitação de cotação\n\n" + quoteLines().map((l) => `${l.qtd} × ${l.nome} (${l.id})`).join("\n");
+    try { await navigator.clipboard.writeText(txt); toast("Pedido copiado"); } catch (e) { prompt("Copie o pedido:", txt); }
+  });
+  $("#quote-download").addEventListener("click", () => {
+    const csv = "codigo;produto;quantidade\n" + quoteLines().map((l) => `${l.id};"${l.nome.replace(/"/g, '""')}";${l.qtd}`).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+    a.download = "cotacao.csv"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("#detail").hidden = true; $("#quote").hidden = true; } });
+  window.addEventListener("popstate", () => { readURL(); syncControls(); render(); });
+
+  $("#theme-btn").addEventListener("click", () => {
+    const root = document.documentElement, cur = root.getAttribute("data-theme");
+    const isDark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = isDark ? "light" : "dark"; root.setAttribute("data-theme", next);
+    try { localStorage.setItem(TKEY, next); } catch (e) {}
+  });
+
+  function syncControls() { $("#q").value = state.q; $("#sort").value = SORTS.hasOwnProperty(state.sort) ? state.sort : (state.sort = "relevancia"); $("#per-page").value = state.per; }
+
+  try { const th = localStorage.getItem(TKEY); if (th) document.documentElement.setAttribute("data-theme", th); } catch (e) {}
+  readURL(); syncControls(); renderQuoteCount(); render(); writeURL(false);
+})();
+</script>
+</body>
+</html>

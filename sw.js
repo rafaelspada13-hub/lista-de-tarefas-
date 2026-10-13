@@ -1,6 +1,6 @@
 /* Central de Tarefas — service worker (offline) */
-const CACHE = "central-tarefas-v2";
-const ASSETS = ["./", "./index.html", "./manifest.json"];
+const CACHE = "central-tarefas-v3";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./catalogo.html"];
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
